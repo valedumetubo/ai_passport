@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI生成パスポート対策</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI生成パスポート対策クイズ</h1>
+        <div id="quiz-area">
+            <p id="question">問題文</p>
+            <div class="options">
+                <button class="option-btn" data-option="1">選択肢１</button>
+                <button class="option-btn" data-option="2">選択肢２</button>
+                <button class="option-btn" data-option="3">選択肢３</button>
+                <button class="option-btn" data-option="4">選択肢４</button>
+            </div>
+            <button id="submit-btn">解答する</button>
+        </div>
+        <div id="result-area" style="display: none;">
+            <h2>結果</h2>
+            <p id="feedback"></p>
+            <p id="correct-answer"></p>
+            <h3>解説</h3>
+            <p id="explanation"></p>
+            <button id="next-question-btn">次の問題へ</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "AIが生成したテキストの典型的な特徴として、最も適切なものはどれですか？",
+                options: ["感情的な表現が豊かである", "特定のトピックに偏りなく広範囲に及ぶ", "論理的な矛盾がなく常に正確である", "自然な文章だが、時に不自然な言い回しが見られる"],
+                answer: 4, // 0-indexed: 選択肢４が正解
+                explanation: "AIが生成したテキストは、自然な文章に見えても、学習データに起因する不自然な言い回しや、文脈上不適切な表現が含まれることがあります。"
+            },
+            {
+                question: "AIが生成した画像を見分ける際のポイントとして、不適切なものはどれですか？",
+                options: ["不自然な影や光の描写がある", "背景に一貫性がなく、矛盾する要素がある", "細部まで完全に写実的で完璧である", "人物の指の数が多かったり少なかったりする"],
+                answer: 3, // 選択肢３が不適切
+                explanation: "AI生成画像は、一見リアルに見えても、細部（特に指や目など）に不自然さが見られたり、光の当たり方や影のつき方が非現実的であったりすることがあります。完璧な写実性は、かえってAI生成の可能性を示唆することがあります。"
+            },
+            {
+                question: "AIが生成した音声コンテンツにありがちな特徴は何ですか？",
+                options: ["感情の起伏が豊かで、人間らしさを完全に再現している", "イントネーションやアクセントが不自然に聞こえることがある", "非常に自然な会話の流れで、途切れることがない", "発話速度が常に一定で、違和感がない"],
+                answer: 2, // 選択肢２が正解
+                explanation: "AI生成音声は近年非常に進化していますが、感情のニュアンスや自然な会話の間の取り方、イントネーションなどが不自然に聞こえることがあります。特に不自然なアクセントや抑揚はAI生成音声の識別の手がかりになります。"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const questionElement = document.getElementById('question');
+        const optionButtons = document.querySelectorAll('.option-btn');
+        const submitButton = document.getElementById('submit-btn');
+        const quizArea = document.getElementById('quiz-area');
+        const resultArea = document.getElementById('result-area');
+        const feedbackElement = document.getElementById('feedback');
+        const correctAnswerElement = document.getElementById('correct-answer');
+        const explanationElement = document.getElementById('explanation');
+        const nextQuestionButton = document.getElementById('next-question-btn');
+
+        let selectedOption = null;
+
+        function loadQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const currentQ = questions[currentQuestionIndex];
+                questionElement.textContent = currentQ.question;
+                optionButtons.forEach((button, index) => {
+                    button.textContent = currentQ.options[index];
+                    button.classList.remove('selected', 'correct', 'wrong');
+                    button.disabled = false;
+                });
+                submitButton.style.display = 'block';
+                resultArea.style.display = 'none';
+                quizArea.style.display = 'block';
+                selectedOption = null;
+            } else {
+                displayFinalScore();
+            }
+        }
+
+        function selectOption(event) {
+            optionButtons.forEach(button => button.classList.remove('selected'));
+            event.target.classList.add('selected');
+            selectedOption = parseInt(event.target.dataset.option);
+        }
+
+        function submitAnswer() {
+            if (selectedOption === null) {
+                alert('選択肢を選んでください！');
+                return;
+            }
+
+            const currentQ = questions[currentQuestionIndex];
+            const correctOptionIndex = currentQ.answer - 1; // 0-indexedにする
+
+            optionButtons.forEach((button, index) => {
+                button.disabled = true; // 解答後は選択肢を無効化
+                if (index === correctOptionIndex) {
+                    button.classList.add('correct');
+                }
+                if (parseInt(button.dataset.option) === selectedOption && selectedOption !== currentQ.answer) {
+                    button.classList.add('wrong');
+                }
+            });
+
+            if (selectedOption === currentQ.answer) {
+                feedbackElement.textContent = '正解です！';
+                score++;
+            } else {
+                feedbackElement.textContent = '不正解です。';
+            }
+
+            correctAnswerElement.textContent = `正解: ${currentQ.options[correctOptionIndex]}`;
+            explanationElement.textContent = currentQ.explanation;
+
+            submitButton.style.display = 'none';
+            quizArea.style.display = 'none';
+            resultArea.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function displayFinalScore() {
+            quizArea.style.display = 'none';
+            resultArea.style.display = 'block';
+            feedbackElement.textContent = `クイズ終了！あなたのスコアは ${score} / ${questions.length} です。`;
+            correctAnswerElement.textContent = '';
+            explanationElement.textContent = 'すべての問題が終了しました。';
+            nextQuestionButton.style.display = 'none'; // 最後の問題の後、次の問題ボタンを非表示にする
+        }
+
+
+        optionButtons.forEach(button => {
+            button.addEventListener('click', selectOption);
+        });
+
+        submitButton.addEventListener('click', submitAnswer);
+        nextQuestionButton.addEventListener('click', nextQuestion);
+
+        loadQuestion(); // 最初の問題をロード
+    </script>
+</body>
+</html>
