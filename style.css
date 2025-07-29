@@ -76,7 +76,7 @@ h1 {
     border-color: #dc3545;
 }
 
-#submit-btn, #next-question-btn {
+#submit-btn, #next-question-btn, #review-questions-btn, #restart-quiz-btn { /* 追加 */
     background-color: #28a745;
     color: white;
     border: none;
@@ -87,9 +87,21 @@ h1 {
     transition: background-color 0.3s ease;
     margin-top: 20px;
 }
+#review-questions-btn {
+    background-color: #007bff; /* 青系の色に */
+}
+#restart-quiz-btn {
+    background-color: #6c757d; /* 灰色系の色に */
+}
 
 #submit-btn:hover, #next-question-btn:hover {
     background-color: #218838;
+}
+#review-questions-btn:hover {
+    background-color: #0056b3;
+}
+#restart-quiz-btn:hover {
+    background-color: #5a6268;
 }
 
 #result-area {
@@ -125,6 +137,70 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* 追加スタイル */
+#summary-area {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    text-align: left; /* 問題一覧のテキストを左寄せに */
+}
+
+#summary-area h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#question-summary-list {
+    list-style: none;
+    padding: 0;
+}
+
+.summary-item {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.correct-status {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.wrong-status {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.summary-details p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    color: #555;
+}
+
+.summary-details p:last-child {
+    margin-bottom: 0;
+}
+
 @media (max-width: 600px) {
     .container {
         padding: 20px 25px;
@@ -134,7 +210,7 @@ h1 {
         font-size: 1.7em;
     }
 
-    .option-btn, #submit-btn, #next-question-btn {
+    .option-btn, #submit-btn, #next-question-btn, #review-questions-btn, #restart-quiz-btn {
         font-size: 1em;
         padding: 12px 15px;
     }
