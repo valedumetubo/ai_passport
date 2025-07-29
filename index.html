@@ -19,6 +19,7 @@
             </div>
             <button id="submit-btn">解答する</button>
         </div>
+
         <div id="result-area" style="display: none;">
             <h2>結果</h2>
             <p id="feedback"></p>
@@ -26,6 +27,12 @@
             <h3>解説</h3>
             <p id="explanation"></p>
             <button id="next-question-btn">次の問題へ</button>
+            <button id="review-questions-btn" style="display: none;">結果を確認する</button> </div>
+
+        <div id="summary-area" style="display: none;"> <h2>問題と結果一覧</h2>
+            <ul id="question-summary-list">
+                </ul>
+            <button id="restart-quiz-btn">もう一度挑戦する</button>
         </div>
     </div>
 
@@ -35,19 +42,25 @@
                 question: "AIが生成したテキストの典型的な特徴として、最も適切なものはどれですか？",
                 options: ["感情的な表現が豊かである", "特定のトピックに偏りなく広範囲に及ぶ", "論理的な矛盾がなく常に正確である", "自然な文章だが、時に不自然な言い回しが見られる"],
                 answer: 4, // 0-indexed: 選択肢４が正解
-                explanation: "AIが生成したテキストは、自然な文章に見えても、学習データに起因する不自然な言い回しや、文脈上不適切な表現が含まれることがあります。"
+                explanation: "AIが生成したテキストは、自然な文章に見えても、学習データに起因する不自然な言い回しや、文脈上不適切な表現が含まれることがあります。",
+                userAnswer: null, // ユーザーの解答を保存
+                isCorrect: null // 正誤を保存
             },
             {
                 question: "AIが生成した画像を見分ける際のポイントとして、不適切なものはどれですか？",
                 options: ["不自然な影や光の描写がある", "背景に一貫性がなく、矛盾する要素がある", "細部まで完全に写実的で完璧である", "人物の指の数が多かったり少なかったりする"],
                 answer: 3, // 選択肢３が不適切
-                explanation: "AI生成画像は、一見リアルに見えても、細部（特に指や目など）に不自然さが見られたり、光の当たり方や影のつき方が非現実的であったりすることがあります。完璧な写実性は、かえってAI生成の可能性を示唆することがあります。"
+                explanation: "AI生成画像は、一見リアルに見えても、細部（特に指や目など）に不自然さが見られたり、光の当たり方や影のつき方が非現実的であったりすることがあります。完璧な写実性は、かえってAI生成の可能性を示唆することがあります。",
+                userAnswer: null,
+                isCorrect: null
             },
             {
                 question: "AIが生成した音声コンテンツにありがちな特徴は何ですか？",
                 options: ["感情の起伏が豊かで、人間らしさを完全に再現している", "イントネーションやアクセントが不自然に聞こえることがある", "非常に自然な会話の流れで、途切れることがない", "発話速度が常に一定で、違和感がない"],
                 answer: 2, // 選択肢２が正解
-                explanation: "AI生成音声は近年非常に進化していますが、感情のニュアンスや自然な会話の間の取り方、イントネーションなどが不自然に聞こえることがあります。特に不自然なアクセントや抑揚はAI生成音声の識別の手がかりになります。"
+                explanation: "AI生成音声は近年非常に進化していますが、感情のニュアンスや自然な会話の間の取り方、イントネーションなどが不自然に聞こえることがあります。特に不自然なアクセントや抑揚はAI生成音声の識別の手がかりになります。",
+                userAnswer: null,
+                isCorrect: null
             }
         ];
 
@@ -63,6 +76,10 @@
         const correctAnswerElement = document.getElementById('correct-answer');
         const explanationElement = document.getElementById('explanation');
         const nextQuestionButton = document.getElementById('next-question-btn');
+        const reviewQuestionsButton = document.getElementById('review-questions-btn'); // 追加
+        const summaryArea = document.getElementById('summary-area'); // 追加
+        const questionSummaryList = document.getElementById('question-summary-list'); // 追加
+        const restartQuizButton = document.getElementById('restart-quiz-btn'); // 追加
 
         let selectedOption = null;
 
@@ -78,6 +95,7 @@
                 submitButton.style.display = 'block';
                 resultArea.style.display = 'none';
                 quizArea.style.display = 'block';
+                summaryArea.style.display = 'none'; // 問題ロード時は一覧を非表示
                 selectedOption = null;
             } else {
                 displayFinalScore();
@@ -99,6 +117,10 @@
             const currentQ = questions[currentQuestionIndex];
             const correctOptionIndex = currentQ.answer - 1; // 0-indexedにする
 
+            // ユーザーの解答と正誤を保存
+            currentQ.userAnswer = selectedOption;
+            currentQ.isCorrect = (selectedOption === currentQ.answer);
+
             optionButtons.forEach((button, index) => {
                 button.disabled = true; // 解答後は選択肢を無効化
                 if (index === correctOptionIndex) {
@@ -109,7 +131,7 @@
                 }
             });
 
-            if (selectedOption === currentQ.answer) {
+            if (currentQ.isCorrect) {
                 feedbackElement.textContent = '正解です！';
                 score++;
             } else {
@@ -122,6 +144,15 @@
             submitButton.style.display = 'none';
             quizArea.style.display = 'none';
             resultArea.style.display = 'block';
+
+            // 最後の問題の場合は「結果を確認する」ボタンを表示
+            if (currentQuestionIndex === questions.length - 1) {
+                nextQuestionButton.style.display = 'none';
+                reviewQuestionsButton.style.display = 'block';
+            } else {
+                nextQuestionButton.style.display = 'block';
+                reviewQuestionsButton.style.display = 'none';
+            }
         }
 
         function nextQuestion() {
@@ -135,7 +166,53 @@
             feedbackElement.textContent = `クイズ終了！あなたのスコアは ${score} / ${questions.length} です。`;
             correctAnswerElement.textContent = '';
             explanationElement.textContent = 'すべての問題が終了しました。';
-            nextQuestionButton.style.display = 'none'; // 最後の問題の後、次の問題ボタンを非表示にする
+            nextQuestionButton.style.display = 'none';
+            reviewQuestionsButton.style.display = 'block'; // 最後の問題の後、結果確認ボタンを表示
+        }
+
+        // 問題一覧を表示する関数
+        function showQuestionSummary() {
+            quizArea.style.display = 'none';
+            resultArea.style.display = 'none';
+            summaryArea.style.display = 'block';
+            questionSummaryList.innerHTML = ''; // リストをクリア
+
+            questions.forEach((q, index) => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('summary-item');
+
+                const statusClass = q.isCorrect ? 'correct-status' : 'wrong-status';
+                const statusText = q.isCorrect ? '正解' : '不正解';
+
+                const userAnswerText = q.userAnswer !== null ? `あなたの答え: ${q.options[q.userAnswer - 1]}` : '未解答';
+                const correctAnswerText = `正解: ${q.options[q.answer - 1]}`;
+
+                listItem.innerHTML = `
+                    <div class="summary-header">
+                        <span class="${statusClass}">${statusText}</span>
+                        <strong>問題 ${index + 1}:</strong> ${q.question}
+                    </div>
+                    <div class="summary-details">
+                        <p>${userAnswerText}</p>
+                        <p>${correctAnswerText}</p>
+                        <p>解説: ${q.explanation}</p>
+                    </div>
+                `;
+                questionSummaryList.appendChild(listItem);
+            });
+        }
+
+        // クイズをリスタートする関数
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            // questions配列のユーザーの解答と正誤をリセット
+            questions.forEach(q => {
+                q.userAnswer = null;
+                q.isCorrect = null;
+            });
+            loadQuestion(); // 最初の問題をロード
+            reviewQuestionsButton.style.display = 'none'; // リスタート時は非表示
         }
 
 
@@ -145,6 +222,8 @@
 
         submitButton.addEventListener('click', submitAnswer);
         nextQuestionButton.addEventListener('click', nextQuestion);
+        reviewQuestionsButton.addEventListener('click', showQuestionSummary); // 追加
+        restartQuizButton.addEventListener('click', restartQuiz); // 追加
 
         loadQuestion(); // 最初の問題をロード
     </script>
