@@ -15,7 +15,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 700px;
+    max-width: 900px; /* ここを広げました (例: 700px -> 900px) */
     text-align: center;
 }
 
@@ -76,7 +76,7 @@ h1 {
     border-color: #dc3545;
 }
 
-#submit-btn, #next-question-btn, #review-questions-btn, #restart-quiz-btn { /* 追加 */
+#submit-btn, #next-question-btn, #review-questions-btn, #restart-quiz-btn {
     background-color: #28a745;
     color: white;
     border: none;
@@ -86,12 +86,13 @@ h1 {
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin-top: 20px;
+    white-space: nowrap; /* ボタン内のテキストも改行しない */
 }
 #review-questions-btn {
-    background-color: #007bff; /* 青系の色に */
+    background-color: #007bff;
 }
 #restart-quiz-btn {
-    background-color: #6c757d; /* 灰色系の色に */
+    background-color: #6c757d;
 }
 
 #submit-btn:hover, #next-question-btn:hover {
@@ -144,7 +145,7 @@ h1 {
     background-color: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e0e0e0;
-    text-align: left; /* 問題一覧のテキストを左寄せに */
+    text-align: left;
 }
 
 #summary-area h2 {
@@ -168,42 +169,57 @@ h1 {
 }
 
 .summary-header {
-    display: flex;
-    align-items: center;
+    display: flex; /* Flexboxを適用 */
+    align-items: baseline; /* 行の基準線を揃える */
     margin-bottom: 10px;
+    flex-wrap: nowrap; /* 改行をしない */
+}
+
+.summary-header strong {
+    white-space: nowrap; /* "問題 1:" の部分を改行しない */
+    margin-right: 5px; /* 少しスペースを空ける */
+}
+
+.summary-header span.correct-status,
+.summary-header span.wrong-status {
+    flex-shrink: 0; /* 縮小しない */
+    margin-right: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+    white-space: nowrap; /* "正解" や "不正解" を改行しない */
 }
 
 .correct-status {
     background-color: #28a745;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    margin-right: 10px;
 }
 
 .wrong-status {
     background-color: #dc3545;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    margin-right: 10px;
 }
 
 .summary-details p {
     margin: 5px 0;
     font-size: 0.95em;
     color: #555;
+    word-break: break-word; /* 長い単語は途中で改行できるようにする */
 }
-
-.summary-details p:last-child {
+.summary-details p:first-child { /* "あなたの答え"のPタグ */
+    white-space: normal; /* 通常の改行ルール */
+}
+.summary-details p:nth-child(2) { /* "正解"のPタグ */
+    white-space: normal; /* 通常の改行ルール */
+}
+.summary-details p:last-child { /* "解説"のPタグ */
     margin-bottom: 0;
 }
 
-@media (max-width: 600px) {
+
+@media (max-width: 950px) { /* containerのmax-widthに合わせて調整 */
     .container {
         padding: 20px 25px;
+        max-width: 100%; /* 小さい画面では横幅をいっぱい使う */
     }
 
     h1 {
@@ -213,5 +229,25 @@ h1 {
     .option-btn, #submit-btn, #next-question-btn, #review-questions-btn, #restart-quiz-btn {
         font-size: 1em;
         padding: 12px 15px;
+    }
+
+    .summary-header {
+        flex-direction: column; /* 小さい画面では縦に並べる */
+        align-items: flex-start;
+    }
+    .summary-header span {
+        margin-bottom: 5px; /* 上下にスペース */
+    }
+}
+
+@media (max-width: 600px) { /* スマートフォンなどさらに小さい画面用 */
+    .container {
+        padding: 15px 15px;
+    }
+    .summary-header strong {
+        font-size: 0.9em; /* 問題番号のフォントサイズ調整 */
+    }
+    .summary-details p {
+        font-size: 0.85em; /* 詳細部分のフォントサイズ調整 */
     }
 }
